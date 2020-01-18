@@ -13,7 +13,7 @@ const Burger = (props) => {
   //     return acc.concat(e)
   //   }, []);
 
-  // map, reduceがわかりにくいからforにしてみた
+  // mapしてreduceするより一周でflattenまでしたほうがいいかも？
   // このほうがわかりやすいが、pythonは更にシンプルになった！
   let transformedIngredients = [];
   Object.entries(props.ingredients).forEach(([ingrediennt, amount]) => {
