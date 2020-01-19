@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
 import Burger from '../../components/Burger/Burger';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
 const INGREDIENT_PRICES = {
   salad: 0.5,
@@ -17,10 +19,18 @@ class BurgerBuilder extends Component {
       cheese: 0,
       meat: 0
     },
-    totalPrice: 4
+    totalPrice: 4,
+    purchasable: false,
+    purchasing: false
   };
 
-  addIngredientHandler = (type) => {
+  updatePurchasableState = (ingredients) => {
+    const sum = Object.values(ingredients)
+      .reduce((acc, curr) => (acc + curr));
+    this.setState({ purchasable: sum > 0 });
+  };
+
+  handleIngredientAdded = (type) => {
     const updatedIngredients = { ...this.state.ingredients };
     updatedIngredients[type] = this.state.ingredients[type] + 1;
 
@@ -32,9 +42,10 @@ class BurgerBuilder extends Component {
       ingredients: updatedIngredients,
       totalPrice: newPrice
     });
+    this.updatePurchasableState(updatedIngredients);
   };
 
-  removeIngredientHandler = (type) => {
+  handleIngredientRemoved = (type) => {
     const updatedIngredients = { ...this.state.ingredients };
     updatedIngredients[type] = this.state.ingredients[type] - 1;
 
@@ -46,24 +57,47 @@ class BurgerBuilder extends Component {
       ingredients: updatedIngredients,
       totalPrice: newPrice
     });
+    this.updatePurchasableState(updatedIngredients);
   };
+
+  handleOrdered = () => {
+    this.setState({ purchasing: true });
+  }
+
+  handlePurchaseCanceled = () => {
+    this.setState({ purchasing: false });
+  }
+
+  handlePurchaseContined = () => {
+    alert('You continued!')
+  }
 
   render() {
     const disabledInfo = {
       ...this.state.ingredients
-    }
-    Object.entries(disabledInfo).forEach(([key, value])=> {
-      disabledInfo[key] = value <= 0;
-    })
+    };
+    Object.entries(disabledInfo).forEach(([type, counts]) => {
+      disabledInfo[type] = counts <= 0;
+    });
 
     return (
       <>
+        <Modal show={this.state.purchasing} onClosed={this.handlePurchaseCanceled}>
+          <OrderSummary
+            ingredients={this.state.ingredients}
+            onPurchaseCanceled={this.handlePurchaseCanceled}
+            onPurchaseContinued={this.handlePurchaseContined}
+            price={this.state.totalPrice}
+          />
+        </Modal>
         <div><Burger ingredients={this.state.ingredients} /></div>
         <BuildControls
-          ingredientAdded={this.addIngredientHandler}
-          ingredientRemoved={this.removeIngredientHandler}
+          onIngredientAdded={this.handleIngredientAdded}
+          onIngredientRemoved={this.handleIngredientRemoved}
           disabled={disabledInfo}
           price={this.state.totalPrice}
+          purchasable={this.state.purchasable}
+          onOrdered={this.handleOrdered}
         />
       </>
     );
