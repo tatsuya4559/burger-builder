@@ -1,7 +1,8 @@
 import React from 'react';
-import Button from '../../UI/Button/Button'
+import Button from '../../UI/Button/Button';
 
 const OrderSummary = (props) => {
+
   const ingredientSummary = Object.entries(props.ingredients)
     .map(([key, value]) => (
       <li key={key}>
