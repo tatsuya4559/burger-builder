@@ -6,7 +6,6 @@ import Order from "../../components/Order/Order";
 
 const Orders = props => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
@@ -20,10 +19,9 @@ const Orders = props => {
           });
         }
         setOrders(fetchedOrder);
-        setLoading(false);
       })
       .catch(err => {
-        setLoading(false);
+        alert(err)
       });
   }, []);
 
